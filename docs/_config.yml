@@ -3,7 +3,7 @@ output: web
 topnav_title: fastai-transformers
 site_title: fastai-transformers
 company_name: Keno Bressem
-description: fastai + Huggingface for radiology reports
+description: use huggingface transformers with fastai
 # Set to false to disable KaTeX math
 use_math: true
 # Add Google analytics id if you have one and want to use it here
