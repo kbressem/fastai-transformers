@@ -2,7 +2,7 @@
   "fastai_transformer": {
     "Overview": "/",
     "Core": "core.html",
-    "Title": "inference.html",
+    "CLI tools": "inference.html",
     "Sequence generation": "sequence-generation.html",
     "Sequence classification": "sequence-classification.html"
   }

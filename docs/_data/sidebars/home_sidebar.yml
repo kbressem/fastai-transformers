@@ -13,7 +13,7 @@ entries:
       title: Core
       url: core.html
     - output: web,pdf
-      title: Title
+      title: CLI tools
       url: inference.html
     - output: web,pdf
       title: Sequence generation
