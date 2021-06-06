@@ -1,7 +1,7 @@
-repository: kbressem/rad_transformer
+repository: kbressem/fastai-transformers
 output: web
-topnav_title: rad_transformer
-site_title: rad_transformer
+topnav_title: fastai-transformers
+site_title: fastai-transformers
 company_name: Keno Bressem
 description: fastai + Huggingface for radiology reports
 # Set to false to disable KaTeX math
