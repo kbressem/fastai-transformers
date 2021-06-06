@@ -8,7 +8,6 @@ index = {"TransformersTokenizer": "01_core.ipynb",
          "DropOutput": "01_core.ipynb",
          "create_transformer_classification_model": "01_core.ipynb",
          "transformers_classifier_learner": "01_core.ipynb",
-         "print_multilabel_classification_report": "01_core.ipynb",
          "Inferencer": "02_inference.ipynb",
          "main": "02_inference.ipynb"}
 
