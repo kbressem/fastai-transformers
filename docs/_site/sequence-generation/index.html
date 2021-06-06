@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Sequence generation with Huggingface transformers and fastai">
+<meta name="keywords" content=" fastai">
+<title>Sequence generation | fastai-transformers</title>
+<link rel="stylesheet" href="/assets/css/syntax.css">
+
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<!--<link rel="stylesheet" type="text/css" href="assets//css/bootstrap.min.css">-->
+<link rel="stylesheet" href="/assets/css/modern-business.css">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="/assets/css/customstyles.css">
+<link rel="stylesheet" href="/assets/css/boxshadowproperties.css">
+<!-- most color styles are extracted out to here -->
+<link rel="stylesheet" href="/assets/css/theme-blue.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<script src="/assets/js/jquery.navgoco.min.js"></script>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement( document.body, {
+    delimiters: [
+      {left: "$$", right: "$$", display: true},
+      {left: "[%", right: "%]", display: true},
+      {left: "$", right: "$", display: false}
+    ]}
+  );
+});
+</script>
+
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<!-- Anchor.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/2.0.0/anchor.min.js"></script>
+<script src="/assets/js/toc.js"></script>
+<script src="/assets/js/customscripts.js"></script>
+
+<link rel="shortcut icon" href="/assets/images/favicon.ico">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<link rel="alternate" type="application/rss+xml" title="fastai-transformers" href="http://localhost:4000/feed.xml">
+
+<!-- Twitter cards -->
+
+
+
+<meta name="twitter:description" content="Sequence generation with Huggingface transformers and fastai">
+
+
+
+<meta name="twitter:card"  content="summary">
+
+
+<!-- end of Twitter cards -->
+
+
+
+
+
+    <script>
+        $(document).ready(function() {
+            // Initialize navgoco with default options
+            $("#mysidebar").navgoco({
+                caretHtml: '',
+                accordion: true,
+                openClass: 'active', // open
+                save: false, // leave false or nav highlighting doesn't work right
+                cookie: {
+                    name: 'navgoco',
+                    expires: false,
+                    path: '/'
+                },
+                slide: {
+                    duration: 400,
+                    easing: 'swing'
+                }
+            });
+
+            $("#collapseAll").click(function(e) {
+                e.preventDefault();
+                $("#mysidebar").navgoco('toggle', false);
+            });
+
+            $("#expandAll").click(function(e) {
+                e.preventDefault();
+                $("#mysidebar").navgoco('toggle', true);
+            });
+
+            // activate menu items where href is matching to current page
+            $("#mysidebar a[href='" + location.pathname.match(/(\/[^\/]*)$/)[1] + "']")
+                .parents('li').addClass('active')
+                .parents('ul').css('display', 'block');
+        });
+
+    </script>
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+    <script>
+        $(document).ready(function() {
+            $("#tg-sb-link").click(function() {
+                $("#tg-sb-sidebar").toggle();
+                $("#tg-sb-content").toggleClass('col-md-9');
+                $("#tg-sb-content").toggleClass('col-md-12');
+                $("#tg-sb-icon").toggleClass('fa-toggle-on');
+                $("#tg-sb-icon").toggleClass('fa-toggle-off');
+            });
+        });
+    </script>
+    
+
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-inverse navbar-static-top">
+    <div class="container topnavlinks">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="fa fa-home fa-lg navbar-brand" href="http://localhost:4000/">&nbsp;<span class="projectTitle">fastai-transformers</span></a>
+        </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <!-- toggle sidebar button -->
+                <li><a id="tg-sb-link" href="#"><i id="tg-sb-icon" class="fa fa-toggle-on"></i> Nav</a></li>
+                <!-- entries without drop-downs appear here -->
+
+
+
+
+                
+                
+                
+                <li><a href="https://github.com/kbressem/fastai-transformers/tree/master/" target="_blank">github</a></li>
+                
+                
+                
+                <!-- entries with drop-downs appear here -->
+                <!-- conditional logic to control which topnav appears for the audience defined in the configuration file.-->
+                
+                
+                
+                
+            </ul>
+        </div>
+        </div>
+        <!-- /.container -->
+</nav>
+
+<!-- Page Content -->
+<div class="container">
+  <div id="main">
+    <!-- Content Row -->
+    <div class="row">
+        
+        
+            <!-- Sidebar Column -->
+            <div class="col-md-3" id="tg-sb-sidebar">
+                
+
+
+<ul id="mysidebar" class="nav">
+  <li class="sidebarTitle"> </li>
+  
+  
+  
+  <li>
+      <a href="#">fastai_transformer</a>
+      <ul>
+          
+          
+          
+          <li><a href="/">Overview</a></li>
+          
+          
+          
+          
+          
+          
+          <li><a href="/core.html">Core</a></li>
+          
+          
+          
+          
+          
+          
+          <li><a href="/inference.html">CLI tools</a></li>
+          
+          
+          
+          
+          
+          
+          <li><a href="/sequence-generation.html">Sequence generation</a></li>
+          
+          
+          
+          
+          
+          
+          <li><a href="/sequence-classification.html">Sequence classification</a></li>
+          
+          
+          
+          
+      </ul>
+   </li>
+     
+      
+      
+      <!-- if you aren't using the accordion, uncomment this block:
+         <p class="external">
+             <a href="#" id="collapseAll">Collapse All</a> | <a href="#" id="expandAll">Expand All</a>
+         </p>
+         -->
+</ul>
+
+<!-- this highlights the active parent class in the navgoco sidebar. this is critical so that the parent expands when you're viewing a page. This must appear below the sidebar code above. Otherwise, if placed inside customscripts.js, the script runs before the sidebar code runs and the class never gets inserted.-->
+<script>$("li.active").parents('li').toggleClass("active");</script>
+
+            </div>
+            
+        
+
+        <!-- Content Column -->
+        <div class="col-md-9" id="tg-sb-content">
+            <div class="post-header">
+    <a id="Sequence generation"></a>
+    <h1 class="post-title-main">Sequence generation</h1>
+    
+        
+    </div>
+
+
+
+<div class="post-content">
+
+   
+    <div class="summary">Sequence generation with Huggingface transformers and fastai</div>
+   
+
+    
+    
+<!-- this handles the automatic toc. use ## for subheads to auto-generate the on-page minitoc. if you use html tags, you must supply an ID for the heading element in order for it to appear in the minitoc. -->
+<script>
+$( document ).ready(function() {
+  // Handler for .ready() called.
+
+$('#toc').toc({ minimumHeaders: 0, listType: 'ul', showSpeed: 0, headers: 'h2,h3,h4' });
+
+/* this offset helps account for the space taken up by the floating toolbar. */
+$('#toc').on('click', 'a', function() {
+  var target = $(this.getAttribute('href'))
+    , scroll_target = target.offset().top
+
+  $(window).scrollTop(scroll_target - 10);
+  return false
+})
+  
+});
+</script>
+
+<div id="toc"></div>
+
+    
+
+
+    
+
+   <!--
+
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: nbs/03_sequence-generation.ipynb
+# command to build the docs after a change: nbdev_build_docs
+
+-->
+
+<div class="container" id="notebook-container">
+        
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">transformers</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span>
+<span class="kn">from</span> <span class="nn">fastai_transformer.core</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">fastai.text.all</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">fastai.distributed</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pretrained_weights</span> <span class="o">=</span> <span class="s1">&#39;gpt2&#39;</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_weights</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;test_data.csv&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">dls</span> <span class="o">=</span> <span class="n">TextDataLoaders</span><span class="o">.</span><span class="n">from_df_with_custom_tok</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">custom_tok</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">,</span> <span class="n">is_lm</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">bs</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">seq_len</span> <span class="o">=</span> <span class="mi">512</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">dls</span><span class="o">.</span><span class="n">show_batch</span><span class="p">(</span><span class="n">max_n</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea ">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>text</th>
+      <th>text_</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>If you like film, don't miss this one. If you prefer action, or horror, or romance, then you'll wonder what's happening. Everyone here is stuck in a gangster film. And what happens is transcendental murder.&lt;br /&gt;&lt;br /&gt;There are few similar films. No doubt it will see limited release, and be hard to find. But the search will be worth it. If you want to study a mileu as a potential symbol, then this is indeed a film to study.&lt;br /&gt;&lt;br /&gt;You can't watch it once. If you do you'll never see what's happening. Dark City is better. Joe Vrs. The Volcano is more fun. But Mad Dog Time could convert the gangsta crowd to symbolism...or at least to think twice before shooting again.The biggest surprise in this movie was the performance of Daryl Hannah. Rather than playing the stereotypical ditzy blonde roles that she usually does she plays a street-smart,</td>
+      <td>you like film, don't miss this one. If you prefer action, or horror, or romance, then you'll wonder what's happening. Everyone here is stuck in a gangster film. And what happens is transcendental murder.&lt;br /&gt;&lt;br /&gt;There are few similar films. No doubt it will see limited release, and be hard to find. But the search will be worth it. If you want to study a mileu as a potential symbol, then this is indeed a film to study.&lt;br /&gt;&lt;br /&gt;You can't watch it once. If you do you'll never see what's happening. Dark City is better. Joe Vrs. The Volcano is more fun. But Mad Dog Time could convert the gangsta crowd to symbolism...or at least to think twice before shooting again.The biggest surprise in this movie was the performance of Daryl Hannah. Rather than playing the stereotypical ditzy blonde roles that she usually does she plays a street-smart,</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>adult, the next a mature man who realises he has gained everything in life apart from what he really wants. In fact we see Latham grow up in this film, when he encounters the problems of those he envies and realises that their lives are not so good, he sees that his own lot is not so bad.&lt;br /&gt;&lt;br /&gt;This film has fewer weak or dud scenes than many other comedies I have seen. Comedy is so much harder than any other type of drama, it either works or it doesn't and very few comedy writers get it correct every time.I particularly loved the drama scene, where the family take to reading parts written by Latham. The pleasure is in the reaction of Tom Valco (James Gandolfini) and the comments of Brian Valco (Josh Zuckerman). It is the dilemma of the greedy Tom Valco who has to bite his</td>
+      <td>, the next a mature man who realises he has gained everything in life apart from what he really wants. In fact we see Latham grow up in this film, when he encounters the problems of those he envies and realises that their lives are not so good, he sees that his own lot is not so bad.&lt;br /&gt;&lt;br /&gt;This film has fewer weak or dud scenes than many other comedies I have seen. Comedy is so much harder than any other type of drama, it either works or it doesn't and very few comedy writers get it correct every time.I particularly loved the drama scene, where the family take to reading parts written by Latham. The pleasure is in the reaction of Tom Valco (James Gandolfini) and the comments of Brian Valco (Josh Zuckerman). It is the dilemma of the greedy Tom Valco who has to bite his tongue,</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_weights</span><span class="p">)</span>
+<span class="n">learn</span> <span class="o">=</span> <span class="n">Learner</span><span class="p">(</span><span class="n">dls</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">loss_func</span><span class="o">=</span><span class="n">CrossEntropyLossFlat</span><span class="p">(),</span> <span class="n">cbs</span><span class="o">=</span><span class="p">[</span><span class="n">DropOutput</span><span class="p">],</span> <span class="n">metrics</span><span class="o">=</span><span class="n">Perplexity</span><span class="p">())</span><span class="o">.</span><span class="n">to_fp16</span><span class="p">()</span>
+<span class="n">learn</span> <span class="o">=</span> <span class="n">learn</span><span class="o">.</span><span class="n">to_parallel</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">learn</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea ">
+
+</div>
+
+</div>
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(#2) [3.7248127460479736,41.46346664428711]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">learn</span><span class="o">.</span><span class="n">lr_find</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea ">
+
+</div>
+
+</div>
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>SuggestedLRs(lr_min=0.017378008365631102, lr_steep=0.14454397559165955)</pre>
+</div>
+
+</div>
+
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">learn</span><span class="o">.</span><span class="n">fit_one_cycle</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="n">wd</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea ">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>epoch</th>
+      <th>train_loss</th>
+      <th>valid_loss</th>
+      <th>perplexity</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>3.853374</td>
+      <td>3.660598</td>
+      <td>38.884571</td>
+      <td>00:13</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>3.727628</td>
+      <td>3.655627</td>
+      <td>38.691753</td>
+      <td>00:14</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>3.582776</td>
+      <td>3.670292</td>
+      <td>39.263374</td>
+      <td>00:13</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>3.471554</td>
+      <td>3.683960</td>
+      <td>39.803696</td>
+      <td>00:13</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>3.393571</td>
+      <td>3.687024</td>
+      <td>39.925835</td>
+      <td>00:13</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot;This movie was &quot;</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">prompt_ids</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+<span class="n">inp</span> <span class="o">=</span> <span class="n">tensor</span><span class="p">(</span><span class="n">prompt_ids</span><span class="p">)[</span><span class="kc">None</span><span class="p">]</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+<span class="n">inp</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>torch.Size([1, 4])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">preds</span> <span class="o">=</span> <span class="n">learn</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">num_beams</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>Setting `pad_token_id` to `eos_token_id`:50256 for open-end generation.
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">preds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&#39;This movie was iced up a bit too much&#39;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+</div>
+ 
+
+
+
+    <div class="tags">
+        
+    </div>
+
+</div>
+
+
+
+<footer>
+            <div class="row">
+                <div class="col-lg-12 footer">
+                  <p><img src="/assets/images/company_logo.png" alt="Company logo"/></p>
+               &copy;2021 Keno Bressem. All rights reserved. <br />
+ Site last generated: Jun 6, 2021 <br />
+                </div>
+            </div>
+</footer>
+
+
+        </div>
+    <!-- /.row -->
+</div>
+<!-- /.container -->
+</div>
+<!-- /#main -->
+    </div>
+
+</body>
+
+</html>
