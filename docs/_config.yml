@@ -65,4 +65,4 @@ plugins:
 
 remote_theme: fastai/nbdev-jekyll-theme
 
-baseurl: /
+baseurl: /fastai_transformer/
