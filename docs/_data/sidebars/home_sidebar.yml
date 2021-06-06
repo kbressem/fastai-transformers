@@ -11,16 +11,16 @@ entries:
       url: /
     - output: web,pdf
       title: Core
-      url: core.html
+      url: /core
     - output: web,pdf
       title: CLI tools
-      url: inference.html
+      url: /inference
     - output: web,pdf
       title: Sequence generation
-      url: sequence-generation.html
+      url: /sequence-generation
     - output: web,pdf
       title: Sequence classification
-      url: sequence-classification.html
+      url: /sequence-classification
     output: web
     title: fastai_transformer
   output: web
