@@ -20,7 +20,7 @@ exclude:
   - .idea/
   - .gitignore
   - vendor
- 
+
 exclude: [vendor]
 
 highlighter: rouge
@@ -60,5 +60,7 @@ sidebars:
 - home_sidebar
 permalink: pretty
 
-theme: jekyll-theme-cayman
-baseurl: /fastai_transformer/
+plugins:
+    - jekyll-remote-theme
+
+remote_theme: fastai/nbdev-jekyll-theme
