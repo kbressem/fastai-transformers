@@ -1,9 +1,0 @@
-{
-  "fastai_transformer": {
-    "Overview": "/",
-    "Core": "/core",
-    "CLI tools": "/inference",
-    "Sequence generation": "/sequence-generation",
-    "Sequence classification": "/sequence-classification"
-  }
-}
