@@ -14,7 +14,7 @@ index = {"TransformersTokenizer": "01_core.ipynb",
 modules = ["core.py",
            "predict.py"]
 
-doc_url = "https://kbressem.github.io/fastai_transformer/"
+doc_url = "https://kbressem.github.io/"
 
 git_url = "https://github.com/kbressem/fastai-transformers/tree/master/"
 
