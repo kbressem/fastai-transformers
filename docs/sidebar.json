@@ -1,8 +1,9 @@
 {
-  "rad_transformer": {
+  "fastai_transformer": {
     "Overview": "/",
-    "module name here": "core.html",
-    "Data Extraction": "data-extraction.html",
-    "Merging Report Texts and Annotations": "data-matching.html"
+    "Core": "core.html",
+    "Title": "inference.html",
+    "Sequence generation": "sequence-generation.html",
+    "Sequence classification": "sequence-classification.html"
   }
 }

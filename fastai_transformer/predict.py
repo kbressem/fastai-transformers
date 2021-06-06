@@ -41,14 +41,6 @@ def _predict(model_name, items):
                          'preds': preds})
 
 # Cell
-_model_names = {
-    'bert': '/media/ScaleOut/pretrained/pickled_fastai_models/ct_classification/bert.pkl',
-    'distilbert': '/media/ScaleOut/pretrained/pickled_fastai_models/ct_classification/distilbert.pkl',
-    'lstm': '/media/ScaleOut/pretrained/pickled_fastai_models/ct_classification/lstm.pkl',
-    'roberta': '/media/ScaleOut/pretrained/pickled_fastai_models/ct_classification/roberta.pkl',
-}
-
-# Cell
 @call_parse
 def main(model_name:Param('The path to the pickled fastai model', str) ,
             items:Param('A single file to predict or a folder with files to predict', str)):

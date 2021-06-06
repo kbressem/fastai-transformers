@@ -10,15 +10,18 @@ entries:
       title: Overview
       url: /
     - output: web,pdf
-      title: module name here
+      title: Core
       url: core.html
     - output: web,pdf
-      title: Data Extraction
-      url: data-extraction.html
+      title: Title
+      url: inference.html
     - output: web,pdf
-      title: Merging Report Texts and Annotations
-      url: data-matching.html
+      title: Sequence generation
+      url: sequence-generation.html
+    - output: web,pdf
+      title: Sequence classification
+      url: sequence-classification.html
     output: web
-    title: rad_transformer
+    title: fastai_transformer
   output: web
   title: Sidebar
